@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="7">
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="8,2">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="layout_Cam"/>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="5,0,2,0,3">
+        <property name="spacing">
+         <number>20</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="lay_controls">
+          <property name="spacing">
+           <number>20</number>
+          </property>
+          <item>
+           <widget class="QToolButton" name="tbn_cali">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>开始标定</string>
+            </property>
+            <property name="icon">
+             <iconset resource="res/res.qrc">
+              <normaloff>:/icons/cali-en.png</normaloff>
+              <normalon>:/icons/cali-en.png</normalon>
+              <activeon>:/icons/cali-dis.png</activeon>:/icons/cali-en.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>76</width>
+              <height>76</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="tbn_recode">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>记录</string>
+            </property>
+            <property name="icon">
+             <iconset resource="res/res.qrc">
+              <normaloff>:/icons/recode.png</normaloff>:/icons/recode.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>68</width>
+              <height>68</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="tbn_stop">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>停止跟踪</string>
+            </property>
+            <property name="icon">
+             <iconset resource="res/res.qrc">
+              <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>68</width>
+              <height>68</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="tbn_weld">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>开始跟踪</string>
+            </property>
+            <property name="icon">
+             <iconset resource="res/res.qrc">
+              <normaloff>:/icons/wel.png</normaloff>:/icons/wel.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>76</width>
+              <height>76</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="light_layout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>马达状态:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>标定相机:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>前置相机:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>垂直相机:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="sts_label" rowstretch="1,1,1,0">
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>气体流量计:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>工作状态:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>异常事件:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="lbl_air">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="lbl_workStatus">
+            <property name="text">
+             <string>未开始</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="lbl_error">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>垂直偏差:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_7">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>20</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="separator"/>
+   <addaction name="actionLabelInit"/>
+   <addaction name="actionImportLast"/>
+   <addaction name="separator"/>
+   <addaction name="actionLabeltakePic"/>
+   <addaction name="actiontakePicture"/>
+   <addaction name="separator"/>
+   <addaction name="actionLabelDebugModel"/>
+   <addaction name="actionDebug"/>
+   <addaction name="separator"/>
+   <addaction name="actionLabelCapture"/>
+   <addaction name="actionCamStartCapture"/>
+   <addaction name="separator"/>
+   <addaction name="separator"/>
+   <addaction name="actionLabelClose"/>
+   <addaction name="actioncloseApp"/>
+   <addaction name="separator"/>
+   <addaction name="actionLabelCam"/>
+   <addaction name="actionCamSetting"/>
+   <addaction name="separator"/>
+   <addaction name="actionLabelMotor"/>
+   <addaction name="actionMotorSetting"/>
+   <addaction name="separator"/>
+  </widget>
+  <action name="actionCamSetting">
+   <property name="icon">
+    <iconset resource="res/res.qrc">
+     <normaloff>:/icons/setting.png</normaloff>:/icons/setting.png</iconset>
+   </property>
+   <property name="text">
+    <string>CamSetting</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;打开相机设置&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="actionCamStartCapture">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/res.qrc">
+     <normaloff>:/icons/play.png</normaloff>
+     <activeon>:/icons/pause.png</activeon>
+     <selectedon>:/icons/pause.png</selectedon>:/icons/play.png</iconset>
+   </property>
+   <property name="text">
+    <string>CamStartCapture</string>
+   </property>
+   <property name="toolTip">
+    <string>开始采集</string>
+   </property>
+  </action>
+  <action name="actiontakePicture">
+   <property name="icon">
+    <iconset resource="res/res.qrc">
+     <normaloff>:/icons/camera.png</normaloff>:/icons/camera.png</iconset>
+   </property>
+   <property name="text">
+    <string>takePicture</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;采集一张图像&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>F4</string>
+   </property>
+  </action>
+  <action name="actionImportLast">
+   <property name="icon">
+    <iconset resource="res/res.qrc">
+     <normaloff>:/icons/loadSetting.png</normaloff>:/icons/loadSetting.png</iconset>
+   </property>
+   <property name="text">
+    <string>startImportLast</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置上次的参数&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/res.qrc">
+     <normaloff>:/icons/foreach.png</normaloff>:/icons/foreach.png</iconset>
+   </property>
+   <property name="text">
+    <string>Debug</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;调试模式&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="actionMotorSetting">
+   <property name="icon">
+    <iconset resource="res/res.qrc">
+     <normaloff>:/icons/motor.png</normaloff>:/icons/motor.png</iconset>
+   </property>
+   <property name="text">
+    <string>motorSetting</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;马达设置&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="actionLabelDebugModel">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>调试模式</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;调试模式&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionLabeltakePic">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>抓取一张图像</string>
+   </property>
+  </action>
+  <action name="actionLabelCam">
+   <property name="text">
+    <string>相机参数设定</string>
+   </property>
+  </action>
+  <action name="actionLabelMotor">
+   <property name="text">
+    <string>马达设定</string>
+   </property>
+   <property name="toolTip">
+    <string>马达设定</string>
+   </property>
+  </action>
+  <action name="actionLabelInit">
+   <property name="text">
+    <string>重新导入上次的设置</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置上次的参数&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="actionLabelCapture">
+   <property name="text">
+    <string>开始采集</string>
+   </property>
+  </action>
+  <action name="actioncloseApp">
+   <property name="icon">
+    <iconset resource="res/res.qrc">
+     <normaloff>:/icons/shutdown.png</normaloff>:/icons/shutdown.png</iconset>
+   </property>
+   <property name="text">
+    <string>closeApp</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;关闭程序&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Q</string>
+   </property>
+  </action>
+  <action name="actionLabelClose">
+   <property name="text">
+    <string>关闭程序</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="res/res.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>actionLabelClose</sender>
+   <signal>triggered()</signal>
+   <receiver>actioncloseApp</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLabelCam</sender>
+   <signal>triggered()</signal>
+   <receiver>actionCamSetting</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLabelDebugModel</sender>
+   <signal>triggered()</signal>
+   <receiver>actionDebug</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLabeltakePic</sender>
+   <signal>triggered()</signal>
+   <receiver>actiontakePicture</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLabelInit</sender>
+   <signal>triggered()</signal>
+   <receiver>actionImportLast</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLabelCapture</sender>
+   <signal>triggered()</signal>
+   <receiver>actionCamStartCapture</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

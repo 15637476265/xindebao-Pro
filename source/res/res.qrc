@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/down.png</file>
+        <file>icons/ledt.png</file>
+        <file>icons/right.png</file>
+        <file>icons/up.png</file>
+        <file>icons/camera.png</file>
+        <file>icons/setting.png</file>
+        <file>icons/play.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/biaoding.png</file>
+        <file>icons/foreach.png</file>
+        <file>icons/shutdown.png</file>
+        <file>icons/motor.png</file>
+        <file>icons/loadSetting.png</file>
+        <file>qss/style.qss</file>
+        <file>qss/icons/checkbox_checked.png</file>
+        <file>qss/icons/checkbox_unchecked.png</file>
+        <file>qss/icons/radiobutton-checked.png</file>
+        <file>qss/icons/radiobutton-unchecked.png</file>
+        <file>icons/cal.png</file>
+        <file>icons/wel.png</file>
+        <file>icons/cali-dis.png</file>
+        <file>icons/cali-en.png</file>
+        <file>icons/stop.png</file>
+        <file>icons/circle.png</file>
+        <file>controls/gray.png</file>
+        <file>controls/green.png</file>
+        <file>controls/red.png</file>
+        <file>icons/recode.png</file>
+    </qresource>
+</RCC>

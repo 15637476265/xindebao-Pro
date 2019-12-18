@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1100</width>
+    <height>814</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabCamera">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="cam1">
+       <attribute name="title">
+        <string>相机1</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QGroupBox" name="gBox1">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>相机设置</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblExp1">
+             <property name="text">
+              <string>曝光</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="lblRoiH1">
+             <property name="text">
+              <string>roi_height</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="ldtRoih1"/>
+           </item>
+           <item row="5" column="3">
+            <widget class="QPushButton" name="btnRoi1">
+             <property name="text">
+              <string>设置</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="lblCamStatus1">
+             <property name="text">
+              <string>相机</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="3">
+            <widget class="QPushButton" name="btnOpenClose1">
+             <property name="text">
+              <string>关闭中</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="3">
+            <widget class="QPushButton" name="btnStopTake1">
+             <property name="text">
+              <string>停止采集</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="ldtExp1"/>
+           </item>
+           <item row="0" column="3">
+            <widget class="QPushButton" name="btnExp1">
+             <property name="text">
+              <string>设置</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lblGain1">
+             <property name="text">
+              <string>增益</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="ldtGain1"/>
+           </item>
+           <item row="1" column="3">
+            <widget class="QPushButton" name="btnGain1">
+             <property name="text">
+              <string>设置</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="lblRoix1">
+             <property name="text">
+              <string>roi_x</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="ldtRoiw1"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="ldtRoix1"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="lblRoiy1">
+             <property name="text">
+              <string>roi_y</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="ldtRoiy1"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="lblRoiw1">
+             <property name="text">
+              <string>roi_width</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QPushButton" name="btnStartTake1">
+             <property name="text">
+              <string>开始采集</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QPushButton" name="btnTakePicture1">
+             <property name="text">
+              <string>拍照</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblCam1">
+          <property name="minimumSize">
+           <size>
+            <width>640</width>
+            <height>512</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color:rgb(114, 159, 207)</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="cam2">
+       <attribute name="title">
+        <string>相机2</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="gBox2">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>相机设置</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblCam2">
+          <property name="minimumSize">
+           <size>
+            <width>640</width>
+            <height>512</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color:rgb(114, 159, 207)</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="cam3">
+       <attribute name="title">
+        <string>相机3</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QGroupBox" name="gBox3">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>相机设置</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblCam3">
+          <property name="minimumSize">
+           <size>
+            <width>640</width>
+            <height>512</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color:rgb(114, 159, 207)</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>XZ平台</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget_2" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>100</height>
+       </size>
+      </property>
+      <widget class="QPushButton" name="pushButton">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>80</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>标定</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>46</y>
+         <width>80</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>焊接</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

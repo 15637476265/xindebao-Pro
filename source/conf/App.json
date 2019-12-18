@@ -1,0 +1,11 @@
+{
+	"allow_debug": true,
+    	"allow_timer_capture": true,
+    	"allow_take_pic": true,
+	"allow_use_vertical_cam":true,
+	"allow_use_toolbar":true, 
+	"allow_use_recode":false,
+    	"allow_load_default_setting":true,
+	"isShieldSport":true,   
+	"version": "20191105"
+}

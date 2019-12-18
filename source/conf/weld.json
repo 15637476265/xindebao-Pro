@@ -1,0 +1,9 @@
+{
+	"averageCount":10,
+	"validUlenPercent":0.70,
+	"detectMaxPix":40,
+	"errorCount":50,
+	"imageMotorOffset":200,
+	"MaxMotorCount":4,
+	"version":"20191213"
+}
