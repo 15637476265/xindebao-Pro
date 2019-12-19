@@ -213,7 +213,7 @@ QByteArray Motor::getGasFlowmeter()
         qWarning("Send Buff Error!");
         _condReply.notify_all();
     }
-    if(0x5A == _readBuffer[0])
+    //if(0x5A == _readBuffer[0])
         for ( size_t i = 0; i < sizeof(_readBuffer); ++i ) {
             array.push_back(_readBuffer[i]);
 

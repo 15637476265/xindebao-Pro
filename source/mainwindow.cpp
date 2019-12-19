@@ -489,10 +489,11 @@ void MainWindow::initLastConfig()
 
 AdjustCamera *MainWindow::GetCameraPointer(int index) const
 {
+
     if(-1 != index){
         return (index == 1)? _calibrat_ptr : (index == 0)?_camera_ptr:_vertical_ptr;
     }else{
-        return _camera_ptr;
+        return (camIndex == 1)? _calibrat_ptr : (camIndex == 0)?_camera_ptr:_vertical_ptr;
     }
 
 }
