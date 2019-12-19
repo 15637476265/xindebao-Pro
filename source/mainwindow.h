@@ -38,6 +38,8 @@ struct WeldingPara{
     int errorCount;
     int imageMotorOffset;
     int MaxMotorCount;
+    double verticalOffset;
+    double Attenuation;
 };
 
 struct GasData{
@@ -45,6 +47,10 @@ struct GasData{
     double mV;
     double gas;
     double dltP;
+};
+
+struct LogMember{
+    bool allow_timer_capture;//
 };
 
 namespace Ui {
@@ -102,6 +108,7 @@ private:
     WeldingData _weldData;
     WeldingPara _welPara;
     GasData _gasData;
+    LogMember _logMember;
 
 
 private slots:
@@ -181,6 +188,7 @@ private:
     void showStream(bool);
     AdjustCamera* GetCameraPointer(int index = -1);   //指向当前显示的相机
     QScopedPointer<std::thread> workThread; //工作线程
+    QScopedPointer<std::thread> verticalThread; //工作线程
     int camIndex; //相机索引
 
 };

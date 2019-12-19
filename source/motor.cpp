@@ -168,18 +168,19 @@ QByteArray Motor::read_from_serial()
 {
     unsigned char dd[11];
     QByteArray array;
-    std::string out ;
-    boost::algorithm::hex(dd, std::back_inserter(out)) ;
 
     _bReply = true ;
     _condReply.notify_one() ;
-    boost::asio::async_read(*_serialPort_ptr,  boost::asio::buffer(_readBuffer),boost::bind( &Motor::recvReply, this, _1, _2 ));
 
 
-    std::this_thread::sleep_for( std::chrono::milliseconds(100) ) ;
     for ( size_t i = 0; i < sizeof(dd); ++i ) {
         array.push_back(dd[i]);
     }
+
+    std::this_thread::sleep_for( std::chrono::milliseconds(100) ) ;
+
+    boost::asio::async_read(*_serialPort_ptr,  boost::asio::buffer(dd),boost::bind( &Motor::recvReply, this, _1, _2 ));
+
     return array;
 }
 

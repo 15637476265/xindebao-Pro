@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initSignals();
 
     ::mkdir("logs/",S_IRWXU);
-    ::mkdir("imgs/",S_IRWXU);
+    ::mkdir("kanfeng/",S_IRWXU);
     ::mkdir("pictures/",S_IRWXU);
     ::mkdir("result/",S_IRWXU);
     ::mkdir("pictures/errorImg/",S_IRWXU);
@@ -147,6 +147,11 @@ void MainWindow::initMemberVariables()
     _welPara.imageMotorOffset = OpenConfig::get<int>("conf/weld.json","imageMotorOffset");
     _welPara.errorCount = OpenConfig::get<int>("conf/weld.json","errorCount");
     _welPara.MaxMotorCount = OpenConfig::get<int>("conf/weld.json","MaxMotorCount");
+    _welPara.verticalOffset = OpenConfig::get<int>("conf/weld.json","verticalOffset");
+    _welPara.Attenuation = OpenConfig::get<double>("conf/weld.json","Attenuation");
+
+
+    _logMember.allow_timer_capture = OpenConfig::get<int>("conf/weld.json","verticalOffset");
 
     _gasData.pa =  OpenConfig::get<double>("conf/gas.json","passGasPa");
 
@@ -452,7 +457,7 @@ void MainWindow::initGasFlowmeter()
                         //_gasData.dltP= (_gasData.mV - 14) / 3.5;
                         //      计算流量
                         //_gasData.gas = pow(_gasData.dltP/(39.94*_gasData.pa),0.5) * 2670.5;
-                        _gasData.gas = (_gasData.mV - 296) / 59.00;
+                        _gasData.gas = (_gasData.mV - 296) / 53.00;
                         if(_gasData.gas<0){
                             _gasData.gas = 0;
                         }
@@ -539,9 +544,9 @@ void MainWindow::initUIControls()
     bool allow_debugForm = OpenConfig::get<bool>("conf/App.json","allow_debug");
     ui->actionDebug->setEnabled(allow_debugForm);
     ui->actionLabelDebugModel->setEnabled(allow_debugForm);
-    bool allow_takePic = OpenConfig::get<bool>("conf/App.json","allow_take_pic");
-    ui->actiontakePicture->setEnabled(allow_takePic);
-    ui->actionLabeltakePic->setEnabled(allow_takePic);
+
+    ui->actiontakePicture->setEnabled(true);
+    ui->actionLabeltakePic->setEnabled(true);
 
     bool allow_use_toolbar = OpenConfig::get<bool>("conf/App.json","allow_use_toolbar");
     ui->toolBar->setVisible(allow_use_toolbar);
@@ -602,6 +607,7 @@ void MainWindow::on_tbn_weld_clicked()
         showMessage("焊接失败!请检查马达，相机，焊针状态!");
         return;
     }
+    allowWeld = true;
 
     workThread.reset(new std::thread([this](){
                         try
@@ -612,14 +618,13 @@ void MainWindow::on_tbn_weld_clicked()
                             static int averCount = 0;   //平均处理时的计数
                             static int movePix = 0;
                             static int maxErrorCount = 0;
-                            while(this->allowWeld)
+                            while(allowWeld)
                             {
                                 std::this_thread::sleep_for( std::chrono::milliseconds(100) ) ;
                                 auto mat = _camera_ptr->takePicture();
                                 cv::cvtColor(mat,mat,CV_BGR2GRAY);
-
-                                if(counts%10==0)
-                                cv::imwrite("imgs/"+to_string(counts++)+".png",mat);
+                                if(_logMember.allow_timer_capture)
+                                    cv::imwrite("kanfeng/"+to_string(counts++)+".png",mat);
 
                                 counts++;
                                 ecdtor.getImg(mat,1);
@@ -647,7 +652,7 @@ void MainWindow::on_tbn_weld_clicked()
                                     averCount++;
                                     double ulen = _weldData.current_u-_weldData.last_motor_pos;
 
-                                    pointLog<<counts<<","<<ulen<<endl;
+                                    pointLog<<counts-1<<","<<ulen<<","<<_weldData.last_motor_pos<<","<<_weldData.current_u<<endl;
                                     if(averCount >= _welPara.averageCount){
                                             averCount = 0;
                                             if((_weldErr / _welPara.averageCount) > (1.0 - _welPara.validUlenPercent)){
@@ -657,7 +662,7 @@ void MainWindow::on_tbn_weld_clicked()
                                                 averCount = 0;
                                                 int valid_count = _welPara.averageCount - _weldErr;
                                                 if(movePix!=0){
-                                                    int _moveStep = _weldData.purseMap * (movePix/valid_count) * _weldData.pix2steps;
+                                                    int _moveStep = (_weldData.purseMap * (movePix/valid_count) * _weldData.pix2steps)/_welPara.Attenuation;
                                                     Direction dirct = (0 > _moveStep)? DECREASE:INCREASE;
                                                     Motor::GetInstance()->posMove(MOTORX,dirct,abs(_moveStep));
                                                     MotorLog<<_moveStep<<endl;
@@ -707,6 +712,22 @@ void MainWindow::on_tbn_weld_clicked()
                     })
     );
     workThread.data()->detach();
+    verticalThread.reset(new std::thread([this](){
+        static int counts = 0;
+        while (allowWeld) {
+            std::this_thread::sleep_for( std::chrono::milliseconds(1000) ) ;
+            auto mat = _vertical_ptr->takePicture();
+            cv::cvtColor(mat,mat,CV_BGR2GRAY);
+            cv::imwrite("vertical/"+to_string(counts++)+".png",mat);
+
+            /* Todo */
+            /* run */
+            /* double ulen = xxxxx(mat); */
+//            if(ulen > _welPara.verticalOffset){
+//                ui->lbl_vertical->setText(QString::number(ulen));
+//            }
+        }
+    }));
     ui->lbl_workStatus->setText("开始跟踪");
 }
 
@@ -714,7 +735,8 @@ void MainWindow::on_tbn_weld_clicked()
 void MainWindow::on_tbn_stop_clicked()
 {
     workThread.reset(nullptr);
-    allowWeld = true;
+    verticalThread.reset(nullptr);
+    allowWeld = false;
     ui->tbn_weld->setEnabled(true);
     ui->lbl_workStatus->setText("未开始");
     ui->lbl_error->clear();
