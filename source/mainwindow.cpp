@@ -613,7 +613,7 @@ void MainWindow::on_tbn_weld_clicked()
                         try
                         {
                             int errCount = 0;
-                            static int counts = 0;
+                            static long counts = 0;
                             static int _weldErr = 0;    //平均处理时的误差计数
                             static int averCount = 0;   //平均处理时的计数
                             static int movePix = 0;
@@ -662,7 +662,7 @@ void MainWindow::on_tbn_weld_clicked()
                                                 averCount = 0;
                                                 int valid_count = _welPara.averageCount - _weldErr;
                                                 if(movePix!=0){
-                                                    int _moveStep = (_weldData.purseMap * (movePix/valid_count) * _weldData.pix2steps)/_welPara.Attenuation;
+                                                    int _moveStep = (_weldData.purseMap * (movePix/valid_count) * _weldData.pix2steps)*_welPara.Attenuation;
                                                     Direction dirct = (0 > _moveStep)? DECREASE:INCREASE;
                                                     Motor::GetInstance()->posMove(MOTORX,dirct,abs(_moveStep));
                                                     MotorLog<<_moveStep<<endl;
@@ -713,7 +713,7 @@ void MainWindow::on_tbn_weld_clicked()
     );
     workThread.data()->detach();
     verticalThread.reset(new std::thread([this](){
-        static int counts = 0;
+        static long counts = 0;
         while (allowWeld) {
             std::this_thread::sleep_for( std::chrono::milliseconds(1000) ) ;
             auto mat = _vertical_ptr->takePicture();

@@ -1,10 +1,18 @@
 {
-	"averageCount":10,
+	"100ms内进行多少次平均":20,
+	"averageCount":40,
+	"有效移动比例":70,
 	"validUlenPercent":0.70,
+	"单次偏移阈值":40,
 	"detectMaxPix":40,
+	"前置监测":50,
 	"errorCount":50,
+	"电机最大偏移像素":4,
 	"imageMotorOffset":200,
+	"电机最大偏移次数":4,
 	"MaxMotorCount":4,
-	"verticalOffset":2,
-	"version":"20191219"
+	"衰减系数":0,
+	"Attenuation":1,
+	"version":"20191213"
+
 }
