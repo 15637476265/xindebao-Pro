@@ -186,7 +186,7 @@ private:
     void showMessage(QString);
     void processCalibration(bool);  //处理标定结果
     void showStream(bool);
-    AdjustCamera* GetCameraPointer(int index = -1);   //指向当前显示的相机
+    AdjustCamera* GetCameraPointer(int index = -1) const;   //指向当前显示的相机
     QScopedPointer<std::thread> workThread; //工作线程
     QScopedPointer<std::thread> verticalThread; //工作线程
     int camIndex; //相机索引

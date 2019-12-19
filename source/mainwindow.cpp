@@ -134,9 +134,12 @@ void MainWindow::initMemberVariables()
     allowWeld = false;
     isCaliEnd = false;
     isShieldSport = OpenConfig::get<bool>("conf/App.json","isShieldSport");
+    isAllowUseVerticalCam = OpenConfig::get<bool>("conf/App.json","allow_use_vertical_cam");
+    _logMember.allow_timer_capture = OpenConfig::get<bool>("conf/App.json","allow_timer_capture");
+
     _weldData.pix2steps = OpenConfig::get<double>("conf/running.json","detect.pix2steps");
     _weldData.purseMap = OpenConfig::get<double>("conf/running.json","detect.purseMap");
-    isAllowUseVerticalCam = OpenConfig::get<bool>("conf/App.json","allow_use_vertical_cam");
+
     gas_rate = OpenConfig::get<float>("conf/running.json","gas_flowmeter.rate");
     gas_init_mV = OpenConfig::get<float>("conf/running.json","gas_flowmeter.no_pass_mV");
 
@@ -151,7 +154,6 @@ void MainWindow::initMemberVariables()
     _welPara.Attenuation = OpenConfig::get<double>("conf/weld.json","Attenuation");
 
 
-    _logMember.allow_timer_capture = OpenConfig::get<int>("conf/weld.json","verticalOffset");
 
     _gasData.pa =  OpenConfig::get<double>("conf/gas.json","passGasPa");
 
@@ -303,25 +305,25 @@ void MainWindow::on_actiontakePicture_triggered()
 void MainWindow::showPicture()
 {
     if(!allowUseCam && !isCamCapting) {return;}
-    cv::Mat _mat = GetCameraPointer()->takePicture();
+    cv::Mat myShow = GetCameraPointer()->takePicture().clone();
     if(1 == camIndex){
         /* Todo.Get pos */
         //获取焊枪坐标点
         //Vec4d _point=********();
         Vec4d _point = (880,400);
-        cv::Mat _cali_mat = QCvImageOperate::draw_calibration(_mat,_point.rows,_point.cols);
+        cv::Mat _cali_mat = QCvImageOperate::draw_calibration(myShow,_point.rows,_point.cols);
         showCvImage(_cali_mat);
     }else if (0 == camIndex) {
         //Motor
-        _mat=QCvImageOperate::draw_focus_plus(_mat,cv::Scalar(0,255,0),_weldData.current_motor_pos,512);
+        myShow=QCvImageOperate::draw_focus_plus(myShow,cv::Scalar(0,255,0),_weldData.current_motor_pos,512);
 
         //绘制Image mid轴
-        _mat=QCvImageOperate::draw_full_line(_mat,cv::Scalar(20,60,220),round(_weldData.current_u));
-        showCvImage(_mat);
+        myShow=QCvImageOperate::draw_full_line(myShow,cv::Scalar(20,60,220),round(_weldData.current_u));
+        showCvImage(myShow);
     }else {
         //垂直相机
         if(isAllowUseVerticalCam){
-            showCvImage(_mat);
+            showCvImage(myShow);
         }
     }
 
@@ -461,7 +463,10 @@ void MainWindow::initGasFlowmeter()
                         if(_gasData.gas<0){
                             _gasData.gas = 0;
                         }
-                        ui->lbl_air->setText(QString::number(_gasData.gas));
+                        if(_gasData.gas > 30.0){
+
+                        }else
+                            ui->lbl_air->setText(QString::number(_gasData.gas));
                     }
 
                 }
@@ -482,22 +487,14 @@ void MainWindow::initLastConfig()
     initGasFlowmeter();
 }
 
-AdjustCamera *MainWindow::GetCameraPointer(int index)
+AdjustCamera *MainWindow::GetCameraPointer(int index) const
 {
-    if(isAllowUseVerticalCam && (2 == camIndex) && (-1 == index)){
-        return _vertical_ptr;
+    if(-1 != index){
+        return (index == 1)? _calibrat_ptr : (index == 0)?_camera_ptr:_vertical_ptr;
+    }else{
+        return _camera_ptr;
     }
 
-    if(-1 != index){
-        return (index == 1)? _calibrat_ptr : (index == 0)?_camera_ptr:_camera_ptr;
-    }
-    if(0 == camIndex){
-        return _camera_ptr;
-    }else if(1 == camIndex)
-        return _calibrat_ptr;
-    else {
-        return _camera_ptr;
-    }
 }
 
 
@@ -621,10 +618,10 @@ void MainWindow::on_tbn_weld_clicked()
                             while(allowWeld)
                             {
                                 std::this_thread::sleep_for( std::chrono::milliseconds(100) ) ;
-                                auto mat = _camera_ptr->takePicture();
+                                auto mat = _camera_ptr->takePicture().clone();
                                 cv::cvtColor(mat,mat,CV_BGR2GRAY);
                                 if(_logMember.allow_timer_capture)
-                                    cv::imwrite("kanfeng/"+to_string(counts++)+".png",mat);
+                                    cv::imwrite("kanfeng/"+to_string(counts)+".png",mat);
 
                                 counts++;
                                 ecdtor.getImg(mat,1);
@@ -715,7 +712,7 @@ void MainWindow::on_tbn_weld_clicked()
     verticalThread.reset(new std::thread([this](){
         static long counts = 0;
         while (allowWeld) {
-            std::this_thread::sleep_for( std::chrono::milliseconds(1000) ) ;
+            std::this_thread::sleep_for( std::chrono::milliseconds(30000) ) ;
             auto mat = _vertical_ptr->takePicture();
             cv::cvtColor(mat,mat,CV_BGR2GRAY);
             cv::imwrite("vertical/"+to_string(counts++)+".png",mat);
@@ -728,6 +725,7 @@ void MainWindow::on_tbn_weld_clicked()
 //            }
         }
     }));
+    verticalThread.data()->detach();
     ui->lbl_workStatus->setText("开始跟踪");
 }
 

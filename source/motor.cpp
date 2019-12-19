@@ -189,7 +189,8 @@ QByteArray Motor::read_from_serial()
 QByteArray Motor::getGasFlowmeter()
 {
     std::lock_guard<std::recursive_mutex> lck(_mtx);
-
+    QByteArray array;
+    array.clear();
     try{
         std::list<unsigned char> __cmd;
 
@@ -204,7 +205,7 @@ QByteArray Motor::getGasFlowmeter()
         string str(__cmd.begin(), __cmd.end());
         boost::asio::write(*_serialPort_ptr, buffer(str.c_str(), __cmd.size()));
         _bReply = false ;
-        //waitReply() ;
+        waitReply() ;
 
     }
     catch(const boost::exception &e)
@@ -212,14 +213,12 @@ QByteArray Motor::getGasFlowmeter()
         qWarning("Send Buff Error!");
         _condReply.notify_all();
     }
+    if(0x5A == _readBuffer[0])
+        for ( size_t i = 0; i < sizeof(_readBuffer); ++i ) {
+            array.push_back(_readBuffer[i]);
 
-    //wait data complate
-//    std::this_thread::sleep_for( std::chrono::milliseconds(150) ) ;
-//    for ( size_t i = 0; i < sizeof(_readBuffer); ++i ) {
-//        array.push_back(_readBuffer[i]);
-
-//    }
-    return read_from_serial();;
+        }
+    return array;
 }
 
 

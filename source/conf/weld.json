@@ -13,6 +13,7 @@
 	"MaxMotorCount":4,
 	"衰减系数":0,
 	"Attenuation":1,
+	"verticalOffset":20,
 	"version":"20191213"
 
 }
