@@ -108,7 +108,7 @@ private:
     WeldingData _weldData;
     WeldingPara _welPara;
     GasData _gasData;
-    RecodeMember _logMember;
+    RecodeMember _recodeMember;
     RunningFlags _runFlag;
     LogMember _logMember;
 

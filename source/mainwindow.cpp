@@ -88,7 +88,7 @@ MainWindow::~MainWindow()
 
 bool MainWindow::GetInitPos()
 {
-    cv::Mat _disp = _camera_ptr->takePicture();
+    cv::Mat _disp = _camera_ptr->takePicture().clone();
     cout<<"Size:"<<_disp.size()<<endl;
     cout<<"channels:"<<_disp.channels()<<endl;
     cout<<"depth:"<<_disp.depth()<<endl;
@@ -114,6 +114,8 @@ bool MainWindow::GetInitPos()
     if(!ret){
         //showMessage("ret false");
         _logMember.errorLog<<"First Calibration False!"<<endl;
+        _logMember.errorLog<<temp1[0]<<","<<temp1[1]<<"\t"<<temp1[2]<<","<<temp1[3]<<endl;
+        _logMember.errorLog<<temp2[0]<<","<<temp2[1]<<"\t"<<temp2[2]<<","<<temp2[3]<<endl;
     }
 
     _weldData.last_motor_pos = _weldData.last_cali_u;
@@ -133,7 +135,7 @@ void MainWindow::initMemberVariables()
     _runFlag.isCaliEnd = false;
     _runFlag.isShieldSport = OpenConfig::get<bool>("conf/App.json","isShieldSport");
     _runFlag.isAllowUseVerticalCam = OpenConfig::get<bool>("conf/App.json","allow_use_vertical_cam");
-    _logMember.allow_timer_capture = OpenConfig::get<bool>("conf/App.json","allow_timer_capture");
+    _recodeMember.allow_timer_capture = OpenConfig::get<bool>("conf/App.json","allow_timer_capture");
 
     _weldData.pix2steps = OpenConfig::get<double>("conf/running.json","detect.pix2steps");
     _weldData.purseMap = OpenConfig::get<double>("conf/running.json","detect.purseMap");
@@ -613,7 +615,7 @@ void MainWindow::on_tbn_weld_clicked()
                                 std::this_thread::sleep_for( std::chrono::milliseconds(100) ) ;
                                 auto mat = _camera_ptr->takePicture().clone();
                                 cv::cvtColor(mat,mat,CV_BGR2GRAY);
-                                if(_logMember.allow_timer_capture)
+                                if(_recodeMember.allow_timer_capture)
                                     cv::imwrite("kanfeng/"+to_string(counts)+".png",mat);
 
                                 counts++;
@@ -706,9 +708,9 @@ void MainWindow::on_tbn_weld_clicked()
         static long counts = 0;
         while (allowWeld) {
             std::this_thread::sleep_for( std::chrono::milliseconds(30000) ) ;
-            auto mat = _vertical_ptr->takePicture();
-            cv::cvtColor(mat,mat,CV_BGR2GRAY);
-            cv::imwrite("vertical/"+to_string(counts++)+".png",mat);
+            auto ver_mat = _vertical_ptr->takePicture().clone();
+            cv::cvtColor(ver_mat,ver_mat,CV_BGR2GRAY);
+            cv::imwrite("vertical/"+to_string(counts++)+".png",ver_mat);
 
             /* Todo */
             /* run */

@@ -1,6 +1,6 @@
 {
-	"100ms内进行多少次平均":20,
-	"averageCount":40,
+	"100ms内进行多少次平均":30,
+	"averageCount":30,
 	"有效移动比例":70,
 	"validUlenPercent":0.70,
 	"单次偏移阈值":40,
