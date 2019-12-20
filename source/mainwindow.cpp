@@ -452,8 +452,8 @@ void MainWindow::initGasFlowmeter()
 
 
                     if(!rec.isEmpty()){
-                        int value = rec[2]*0x100;
-                        value += rec[3];
+                        int value = rec[0]*0x100;
+                        value += rec[1];
                         //       float电压值=整形/100
                         _gasData.mV = value;
                         //_gasData.dltP= (_gasData.mV - 14) / 3.5;
