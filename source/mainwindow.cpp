@@ -47,8 +47,6 @@ string getData()
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
-  ,isCamCapting(false)
-  ,btakePictures(false)
 {
     ui->setupUi(this);
 
@@ -65,14 +63,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ::mkdir("kanfeng/",S_IRWXU);
     ::mkdir("pictures/",S_IRWXU);
     ::mkdir("result/",S_IRWXU);
+    ::mkdir("vertical/",S_IRWXU);
     ::mkdir("pictures/errorImg/",S_IRWXU);
 
     string picTarget = string("pictures/")+getData().c_str()+string("/");
     ::mkdir(picTarget.c_str(),S_IRWXU);
-    log.open("logs/Move"+getData()+".log",ios_base::app);
-    errorLog.open("logs/Error"+getData()+".log",ios_base::app);
-    MotorLog.open("logs/Motor"+getData()+".log",ios_base::app);
-    pointLog.open("logs/Point.log",ios_base::app);
+    _logMember.log.open("logs/Move"+getData()+".log",ios_base::app);
+    _logMember.errorLog.open("logs/Error"+getData()+".log",ios_base::app);
+    _logMember.MotorLog.open("logs/Motor"+getData()+".log",ios_base::app);
+    _logMember.pointLog.open("logs/Point.log",ios_base::app);
 
     initLastConfig();
 
@@ -81,10 +80,10 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
-    log.close();
-    errorLog.close();
-    MotorLog.close();
-    pointLog.close();
+    _logMember.log.close();
+    _logMember.errorLog.close();
+    _logMember.MotorLog.close();
+    _logMember.pointLog.close();
 }
 
 bool MainWindow::GetInitPos()
@@ -114,7 +113,7 @@ bool MainWindow::GetInitPos()
     bool ret = matLine2du(temp1,temp2,_weldData.last_cali_u);
     if(!ret){
         //showMessage("ret false");
-        errorLog<<"First Calibration False!"<<endl;
+        _logMember.errorLog<<"First Calibration False!"<<endl;
     }
 
     _weldData.last_motor_pos = _weldData.last_cali_u;
@@ -127,22 +126,21 @@ bool MainWindow::GetInitPos()
 
 void MainWindow::initMemberVariables()
 {
-    allowUseCam = false;
-
-    isCamCapting = false;
+    _runFlag.allowUseCam = false;
+    _runFlag.isCamCapting = false;
     camIndex = 1;
     allowWeld = false;
-    isCaliEnd = false;
-    isShieldSport = OpenConfig::get<bool>("conf/App.json","isShieldSport");
-    isAllowUseVerticalCam = OpenConfig::get<bool>("conf/App.json","allow_use_vertical_cam");
+    _runFlag.isCaliEnd = false;
+    _runFlag.isShieldSport = OpenConfig::get<bool>("conf/App.json","isShieldSport");
+    _runFlag.isAllowUseVerticalCam = OpenConfig::get<bool>("conf/App.json","allow_use_vertical_cam");
     _logMember.allow_timer_capture = OpenConfig::get<bool>("conf/App.json","allow_timer_capture");
 
     _weldData.pix2steps = OpenConfig::get<double>("conf/running.json","detect.pix2steps");
     _weldData.purseMap = OpenConfig::get<double>("conf/running.json","detect.purseMap");
 
-    gas_rate = OpenConfig::get<float>("conf/running.json","gas_flowmeter.rate");
-    gas_init_mV = OpenConfig::get<float>("conf/running.json","gas_flowmeter.no_pass_mV");
-
+    _gasData.gas_rate = OpenConfig::get<double>("conf/gas.json","gas_rate");
+    _gasData.factory = OpenConfig::get<double>("conf/gas.json","factory");
+    _gasData.max_value =  OpenConfig::get<double>("conf/gas.json","max_value");
 
     _welPara.averageCount = OpenConfig::get<int>("conf/weld.json","averageCount");
     _welPara.detectMaxPix = OpenConfig::get<int>("conf/weld.json","detectMaxPix");
@@ -153,9 +151,6 @@ void MainWindow::initMemberVariables()
     _welPara.verticalOffset = OpenConfig::get<int>("conf/weld.json","verticalOffset");
     _welPara.Attenuation = OpenConfig::get<double>("conf/weld.json","Attenuation");
 
-
-
-    _gasData.pa =  OpenConfig::get<double>("conf/gas.json","passGasPa");
 
     //qDebug()<<_welPara.averageCount<<_welPara.detectMaxPix<<_welPara.validUlenPercent<<_welPara.imageMotorOffset<<_welPara.errorCount;
 }
@@ -208,7 +203,7 @@ void MainWindow::slot_onGainChanged(int index,int gain)
 
 void MainWindow::slot_ShieldSport(bool data)
 {
-    isShieldSport = data;
+    _runFlag.isShieldSport = data;
 }
 
 void MainWindow::slot_ROIChanged(int index,float x, float y, int width, int height)
@@ -296,7 +291,7 @@ void MainWindow::on_actionCamSetting_triggered()
 
 void MainWindow::on_actiontakePicture_triggered()
 {
-    if(!allowUseCam) {return;}
+    if(!_runFlag.allowUseCam) {return;}
     auto mat = GetCameraPointer()->takePicture();
     MainWindow::saveImg(mat);
 }
@@ -304,7 +299,7 @@ void MainWindow::on_actiontakePicture_triggered()
 
 void MainWindow::showPicture()
 {
-    if(!allowUseCam && !isCamCapting) {return;}
+    if(!_runFlag.allowUseCam && !_runFlag.isCamCapting) {return;}
     cv::Mat myShow = GetCameraPointer()->takePicture().clone();
     if(1 == camIndex){
         /* Todo.Get pos */
@@ -322,7 +317,7 @@ void MainWindow::showPicture()
         showCvImage(myShow);
     }else {
         //垂直相机
-        if(isAllowUseVerticalCam){
+        if(_runFlag.isAllowUseVerticalCam){
             showCvImage(myShow);
         }
     }
@@ -355,7 +350,7 @@ void MainWindow::initDevices()
         qCritical("马达打开异常!");
         return;
     }
-    allowUseMotor = true;
+    _runFlag.allowUseMotor = true;
 
     //Open Light
     Motor::GetInstance()->ledTurn(LED1,OPEN);
@@ -377,10 +372,10 @@ void MainWindow::initDevices()
         return;
     }
 
-    allowUseCam = true;
+    _runFlag.allowUseCam = true;
     led_Cali->turnOn();
 
-    if(isAllowUseVerticalCam){
+    if(_runFlag.isAllowUseVerticalCam){
         _vertical_ptr->connectDevice("Cam3");
         if(!_vertical_ptr->isDeviceOpend()){
             qCritical("Cam2相机打开异常!");
@@ -393,28 +388,28 @@ void MainWindow::initDevices()
 
 void MainWindow::slot_btn_ZTop_clicked(int length)
 {
-    if(!allowUseMotor) { return;}
+    if(!_runFlag.allowUseMotor) { return;}
     Motor::GetInstance()->posMove(MOTORZ,INCREASE,length);
     emit logMove("Z上移:",length);
 }
 
 void MainWindow::slot_btn_ZDown_clicked(int length)
 {
-    if(!allowUseMotor) { return;}
+    if(!_runFlag.allowUseMotor) { return;}
     Motor::GetInstance()->posMove(MOTORZ,DECREASE,length);
     emit logMove("Z下移:",length);
 }
 
 void MainWindow::slot_btn_XLeft_clicked(int length)
 {
-    if(!allowUseMotor) { return;}
+    if(!_runFlag.allowUseMotor) { return;}
     Motor::GetInstance()->posMove(MOTORX,DECREASE,length);
     emit logMove("X左移:",length);
 }
 
 void MainWindow::slot_btn_XRight_clicked(int length)
 {
-    if(!allowUseMotor) { return;}
+    if(!_runFlag.allowUseMotor) { return;}
     Motor::GetInstance()->posMove(MOTORX,INCREASE,length);
     emit logMove("X右移:",length);
 }
@@ -456,14 +451,11 @@ void MainWindow::initGasFlowmeter()
                         value += rec[1];
                         //       float电压值=整形/100
                         _gasData.mV = value;
-                        //_gasData.dltP= (_gasData.mV - 14) / 3.5;
-                        //      计算流量
-                        //_gasData.gas = pow(_gasData.dltP/(39.94*_gasData.pa),0.5) * 2670.5;
-                        _gasData.gas = (_gasData.mV - 296) / 53.00;
+                        _gasData.gas = (_gasData.mV - _gasData.factory) / _gasData.gas_rate;
                         if(_gasData.gas<0){
                             _gasData.gas = 0;
                         }
-                        if(_gasData.gas > 30.0){
+                        if(_gasData.gas > _gasData.max_value){
 
                         }else
                             ui->lbl_air->setText(QString::number(_gasData.gas));
@@ -474,7 +466,7 @@ void MainWindow::initGasFlowmeter()
             }
             catch(...)
             {
-                errorLog<<"获取流量数据失败"<<getTime()<<endl;
+                _logMember.errorLog<<"获取流量数据失败"<<getTime()<<endl;
             }
     }
     ).detach();
@@ -502,7 +494,7 @@ AdjustCamera *MainWindow::GetCameraPointer(int index) const
 void MainWindow::RecodeLogResults()
 {
     //记录uv
-    log<<"line1[0]:"<<to_string(line1[0])<<"line1[1]:"<<to_string(line1[1])
+    _logMember.log<<"line1[0]:"<<to_string(line1[0])<<"line1[1]:"<<to_string(line1[1])
       <<"line1[2]:"<<to_string(line1[2])<<"line1[3]:"<<to_string(line1[3])
      <<"line2[0]:"<<to_string(line2[0])<<"line2[1]:"<<to_string(line2[1])
     <<"line2[2]:"<<to_string(line2[2])<<"line2[3]:"<<to_string(line2[3])<<endl;
@@ -513,7 +505,7 @@ void MainWindow::RecodeLogResults()
 void MainWindow::slot_CaptureDebugInfo(QString info,int lenth)
 {
 
-    log<<getTime()+"\t"<<info.toStdString()+to_string(lenth)<<endl;
+    _logMember.log<<getTime()+"\t"<<info.toStdString()+to_string(lenth)<<endl;
     RecodeLogResults();
     RecodeResults();
 }
@@ -573,21 +565,21 @@ void MainWindow::initUIControls()
 //标定按钮被点击
 void MainWindow::on_tbn_cali_clicked()
 {
-    if(!allowUseCam && !allowUseMotor){
+    if(!_runFlag.allowUseCam && !_runFlag.allowUseMotor){
         showMessage("标定失败!请检查马达，相机状态!");
         return;
     }
 
     camIndex = 1;   //标定前使用标定相机
-    isCaliEnd = false;
+    _runFlag.isCaliEnd = false;
 
     showStream(true);
 
-    while(!isCaliEnd){
+    while(!_runFlag.isCaliEnd){
         /* Todo */
         // isCaliSuccess = function();
-        isCaliEnd = true;
-        isCaliSuccess = true;
+        _runFlag.isCaliEnd = true;
+        _runFlag.isCaliSuccess = true;
     }
 
     ui->tbn_cali->setText("重新标定");
@@ -600,8 +592,8 @@ void MainWindow::on_tbn_cali_clicked()
 
 void MainWindow::on_tbn_weld_clicked()
 {
-    isCaliSuccess = true;
-    if(!isCaliSuccess && !allowUseCam && !allowUseMotor){
+    _runFlag.isCaliSuccess = true;
+    if(!_runFlag.isCaliSuccess && !_runFlag.allowUseCam && !_runFlag.allowUseMotor){
         showMessage("焊接失败!请检查马达，相机，焊针状态!");
         return;
     }
@@ -633,7 +625,7 @@ void MainWindow::on_tbn_weld_clicked()
                                 {
                                     if(errCount > _welPara.errorCount)
                                     {
-                                        errorLog<<"Not allow Detected!"<<endl;
+                                        _logMember.errorLog<<"Not allow Detected!"<<endl;
                                         emit weldErr();
                                         break;
                                     }
@@ -644,17 +636,17 @@ void MainWindow::on_tbn_weld_clicked()
                                 //不设定名称会产生时间间隔的图像
                                 MainWindow::saveImg(result,"result/","twogreenlines.png");
 
-                                if(matLine2du(line1,line2,_weldData.current_u)&&isShieldSport)
+                                if(matLine2du(line1,line2,_weldData.current_u)&&_runFlag.isShieldSport)
                                 {
 
                                     averCount++;
                                     double ulen = _weldData.current_u-_weldData.last_motor_pos;
 
-                                    pointLog<<counts-1<<","<<ulen<<","<<_weldData.last_motor_pos<<","<<_weldData.current_u<<endl;
+                                    _logMember.pointLog<<counts-1<<","<<ulen<<","<<_weldData.last_motor_pos<<","<<_weldData.current_u<<endl;
                                     if(averCount >= _welPara.averageCount){
                                             averCount = 0;
                                             if((_weldErr / _welPara.averageCount) > (1.0 - _welPara.validUlenPercent)){
-                                                errorLog<<"valid Ulen Percent Not > 80%!"<<endl;
+                                                _logMember.errorLog<<"valid Ulen Percent Not > 80%!"<<endl;
                                                 throw TAG_WELD_LINE_OUTRANGE_WARNING;
                                             }else{
                                                 averCount = 0;
@@ -663,7 +655,7 @@ void MainWindow::on_tbn_weld_clicked()
                                                     int _moveStep = (_weldData.purseMap * (movePix/valid_count) * _weldData.pix2steps)*_welPara.Attenuation;
                                                     Direction dirct = (0 > _moveStep)? DECREASE:INCREASE;
                                                     Motor::GetInstance()->posMove(MOTORX,dirct,abs(_moveStep));
-                                                    MotorLog<<_moveStep<<endl;
+                                                    _logMember.MotorLog<<_moveStep<<endl;
                                                 }
 
                                                 _weldData.current_motor_pos = _weldData.last_motor_pos+(movePix/valid_count);
@@ -683,7 +675,7 @@ void MainWindow::on_tbn_weld_clicked()
 
 
                                     if(abs(_weldData.first_image_U-_weldData.current_u)>_welPara.imageMotorOffset+200){
-                                        errorLog<<"焊缝偏移过大，请重新焊接!"<<endl;
+                                        _logMember.errorLog<<"焊缝偏移过大，请重新焊接!"<<endl;
                                         qWarning("焊缝偏移过大，请重新焊接2");
                                     }
                                     if(maxErrorCount>_welPara.MaxMotorCount){
@@ -700,12 +692,12 @@ void MainWindow::on_tbn_weld_clicked()
                             for(int i=0; i<4; i++){
                                 lineResult += to_string(line1[i]) + "\t";
                             }
-                            errorLog<<"Weld line1:"<<getTime()<<"\t"<<endl;
+                            _logMember.errorLog<<"Weld line1:"<<getTime()<<"\t"<<endl;
                             lineResult.clear();
                             for(int i=0; i<4; i++){
                                 lineResult += to_string(line2[i]) + "\t";
                             }
-                            errorLog<<"Weld line2:"<<getTime()<<"\t"<<lineResult<<endl;
+                            _logMember.errorLog<<"Weld line2:"<<getTime()<<"\t"<<lineResult<<endl;
                         }
                     })
     );
@@ -753,18 +745,18 @@ void MainWindow::showStream(bool state)
     {
         QObject::connect(qTimer, SIGNAL(timeout()),this, SLOT(showPicture())) ;
         qTimer->start(100);
-        isCamCapting = true;
+        _runFlag.isCamCapting = true;
     }
     else
     {
-        if(isCamCapting)
+        if(_runFlag.isCamCapting)
         {
             qTimer->stop();
             QObject::disconnect(qTimer, SIGNAL(timeout()),this, SLOT(showPicture())) ;
         }
-        isCamCapting = false;
+        _runFlag.isCamCapting = false;
     }
-    ui->actionCamStartCapture->setChecked(isCamCapting);
+    ui->actionCamStartCapture->setChecked(_runFlag.isCamCapting);
 }
 
 void MainWindow::on_tbn_recode_clicked()

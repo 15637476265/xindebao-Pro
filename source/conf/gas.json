@@ -1,4 +1,6 @@
 {
-	"passGasPa":800000,
+	"gas_rate":53.0,
+	"factory":296.0,
+	"max_value":30,
 	"version":"20191216"
 }

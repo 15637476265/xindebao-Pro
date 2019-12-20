@@ -43,13 +43,33 @@ struct WeldingPara{
 };
 
 struct GasData{
-    double pa;
     double mV;
     double gas;
-    double dltP;
+    double max_value;
+    double gas_rate;    //气体流量计比例
+    double factory;     //
+};
+
+struct RunningFlags{
+    bool isCamCapting; //是否正在采集图像
+    bool allowUseCam;   //允许相机使用
+    bool allowUseMotor;   //允许Motor使用
+    bool allowWeld;                //允许焊接
+    bool isCaliEnd;              //是否标定结束
+    bool isCaliSuccess;         //标定是否成功
+    bool isAllowUseVerticalCam; //是否允许使用垂直相机
+    bool isShieldSport;         //是否屏蔽运动
 };
 
 struct LogMember{
+    ofstream log;   //记录图像处理的uv点
+    ofstream MotorLog;  //记录Motor log
+    ofstream errorLog;  //记录error log
+    ofstream pointLog;  //记录point log
+
+};
+
+struct RecodeMember{
     bool allow_timer_capture;//
 };
 
@@ -64,69 +84,57 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    //void openport();
     bool GetInitPos();
-
+    static void saveImg(const cv::Mat &mat, const std::string &_path = "", const std::string &_name = "",const std::string &modify = "");
 
 private:
 
     Ui::MainWindow *ui;
     std::recursive_mutex _mtx;
     AdjustCamera* _camera_ptr;  //采集相机
-
     AdjustCamera* _calibrat_ptr;    //标定相机
-
     AdjustCamera* _vertical_ptr;    //垂直相机
 
 
-    bool isCamCapting; //是否正在采集图像
-    bool btakePictures;
-    bool allowUseCam;   //允许相机使用
-    bool allowUseMotor;   //允许Motor使用
     bool allowWeld;       //允许焊接
-    bool isCaliEnd;       //是否标定结束
-    bool isCaliSuccess;   //标定是否成功
-    bool isAllowUseVerticalCam; //是否允许使用垂直相机
-    bool isShieldSport; //是否屏蔽运动
 
-    float gas_rate;         //气体流量计比例
-    float gas_init_mV;         //气体流量计初始电压值
 
     Vec4d line1,line2; //记录图像处理的uv点
 
     QTimer* qTimer; //定时器用于刷新当前图像
-
     QPoint uv;
-    ofstream log;   //记录图像处理的uv点
-    ofstream MotorLog;  //记录Motor log
-    ofstream errorLog;  //记录error log
-    ofstream pointLog;  //记录error log
-
-    static void saveImg(const cv::Mat &mat, const std::string &_path = "", const std::string &_name = "",const std::string &modify = "");
 
 
     WeldingData _weldData;
     WeldingPara _welPara;
     GasData _gasData;
+    RecodeMember _logMember;
+    RunningFlags _runFlag;
     LogMember _logMember;
 
-
+/* UI Slots */
 private slots:
-
     void on_actioncloseApp_triggered();
     void on_actionImportLast_triggered();
+    void on_actionCamSetting_triggered();
+    void on_actionCamStartCapture_triggered(bool checked);
+    void on_actiontakePicture_triggered();
+    void on_actionMotorSetting_triggered();
+    void on_actionDebug_triggered();
+    void on_tbn_cali_clicked();
+    void on_tbn_weld_clicked();
+    void on_tbn_stop_clicked();
+    void on_tbn_recode_clicked();
+
+/* User Slots */
+private slots:
+    void weldErrServ();
+    void showPicture();
+
     void slot_btn_ZTop_clicked(int);
     void slot_btn_ZDown_clicked(int);
     void slot_btn_XLeft_clicked(int);
     void slot_btn_XRight_clicked(int);
-
-
-    void on_actionCamSetting_triggered();
-    void on_actionCamStartCapture_triggered(bool checked);
-    void on_actiontakePicture_triggered();
-
-    void weldErrServ();
-    void showPicture();
 
     void slot_CaptureDebugInfo(QString info,int lenth);
     void slot_onExposureChanged(int,int);//exposure changed
@@ -136,21 +144,12 @@ private slots:
 
     void slot_PicPressed(QPoint);
 
-    void on_actionMotorSetting_triggered();
 
-    void on_actionDebug_triggered();
-
-    void on_tbn_cali_clicked();
-
-    void on_tbn_weld_clicked();
-
-    void on_tbn_stop_clicked();
-
-    void on_tbn_recode_clicked();
 
 signals:
     void weldErr();
     void logMove(QString ,int);
+
 private:
     CamSetting *camSetting;
     MotorSetting *motorSetting;
@@ -161,9 +160,6 @@ private:
     QStatusLight *led_Cali;
     QStatusLight *led_front;
     QStatusLight *led_vertical;
-
-
-
 
 
 

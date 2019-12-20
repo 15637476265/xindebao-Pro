@@ -10,9 +10,6 @@
     "pix_mapping":40,
     "allowable_erre":0.8
     },
-    "gas_flowmeter":{
-        "no_pass_mV":20.00,
-        "rate":0.01    
-    },
+
     "version":"20191105"
 }
