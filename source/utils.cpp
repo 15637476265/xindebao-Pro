@@ -15,6 +15,7 @@ bool matLine2du(Vec4d line1,Vec4d line2,double & mu,int v0)
     // cal du
     double u1 = u12 + (u11-u12)*(v0-v12)/(v11-v12);
     double u2 = u22 + (u21-u22)*(v0-v22)/(v21-v22);
-    mu = round((u1+u2)/2);
+    //mu = round((u1+u2)/2);
+    mu = (u1+u2)/2;
     return true;
 }

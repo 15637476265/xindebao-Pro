@@ -24,7 +24,7 @@ struct WeldingData{
     double pix2steps; ///像素距离转换关系
     double purseMap;    //脉冲距离比例关系
     double first_image_U;
-    int last_motor_pos;     ///last Motor pos
+    double last_motor_pos;     ///last Motor pos
     double current_motor_pos;
     double last_cali_u;     //上次图像标定计算的中心
     double current_u ;      ///当前算法给出的中线x

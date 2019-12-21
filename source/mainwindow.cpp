@@ -608,7 +608,7 @@ void MainWindow::on_tbn_weld_clicked()
                             static long counts = 0;
                             static int _weldErr = 0;    //平均处理时的误差计数
                             static int averCount = 0;   //平均处理时的计数
-                            static int movePix = 0;
+                            static double movePix = 0;
                             static int maxErrorCount = 0;
                             while(allowWeld)
                             {
