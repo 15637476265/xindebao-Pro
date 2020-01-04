@@ -157,8 +157,6 @@ void AdjustCamera::disconnectDevice()
 GX_STATUS AdjustCamera::OpenDevice()
 {
     std::lock_guard<std::recursive_mutex> lck(_mtx);
-
-
     std::string serial =  OpenConfig::get<std::string>("conf/camera.json",_cam_index+".id");
 
     GX_STATUS  status = GX_STATUS_SUCCESS;

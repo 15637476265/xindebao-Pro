@@ -66,6 +66,7 @@ struct LogMember{
     ofstream MotorLog;  //记录Motor log
     ofstream errorLog;  //记录error log
     ofstream pointLog;  //记录point log
+    ofstream systemLog;  //记录system log
 
 };
 
@@ -178,6 +179,10 @@ private:
     void RecodeResults();   //记录log
     void initGasFlowmeter();    //初始化气体流量计
     void initLastConfig();
+
+    void openLog();
+    void closeLog();
+    void updateDirPath();
 
     void showMessage(QString);
     void processCalibration(bool);  //处理标定结果

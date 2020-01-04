@@ -11,16 +11,27 @@
 #include <QDebug>
 
 static edgeCurveDetector ecdtor(true,5);
+static std::string currentPath = "";
 
 using namespace std;
 using namespace cv;
+
+inline void tryCloseFile(ofstream *file){
+    if(file->is_open()){
+        file->close();
+    }
+}
+
+inline void _mkdir(string path){
+    ::mkdir(path.c_str(),S_IRWXU);
+}
 
 string getTime()
 {
     time_t timep;
     time(&timep);
     char tmp[32];
-    strftime(tmp, sizeof(tmp), "%H:%M:%S",localtime(&timep) );
+    strftime(tmp, sizeof(tmp), "%H_%M_%S",localtime(&timep) );
     return tmp;
 }
 
@@ -59,19 +70,18 @@ MainWindow::MainWindow(QWidget *parent) :
     initObject();
     initSignals();
 
-    ::mkdir("logs/",S_IRWXU);
-    ::mkdir("kanfeng/",S_IRWXU);
     ::mkdir("pictures/",S_IRWXU);
-    ::mkdir("result/",S_IRWXU);
-    ::mkdir("vertical/",S_IRWXU);
+
+    ::mkdir("results/",S_IRWXU);
+
+    ::mkdir("logs/",S_IRWXU);
+
     ::mkdir("pictures/errorImg/",S_IRWXU);
 
     string picTarget = string("pictures/")+getData().c_str()+string("/");
     ::mkdir(picTarget.c_str(),S_IRWXU);
-    _logMember.log.open("logs/Move"+getData()+".log",ios_base::app);
-    _logMember.errorLog.open("logs/Error"+getData()+".log",ios_base::app);
-    _logMember.MotorLog.open("logs/Motor"+getData()+".log",ios_base::app);
-    _logMember.pointLog.open("logs/Point.log",ios_base::app);
+
+    _logMember.systemLog.open("logs/Error.log",ios_base::app);
 
     initLastConfig();
 
@@ -80,10 +90,37 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
-    _logMember.log.close();
-    _logMember.errorLog.close();
-    _logMember.MotorLog.close();
-    _logMember.pointLog.close();
+    tryCloseFile(&_logMember.systemLog);
+    closeLog();
+}
+
+void MainWindow::openLog()
+{
+    _logMember.log.open(currentPath+"logs/Move"+".log",ios_base::app);
+    _logMember.errorLog.open(currentPath+"logs/Error"+".log",ios_base::app);
+    _logMember.MotorLog.open(currentPath+"logs/Motor"+".log",ios_base::app);
+    _logMember.pointLog.open(currentPath+"logs/Point.log",ios_base::app);
+
+}
+
+void MainWindow::closeLog()
+{
+    tryCloseFile(&_logMember.log);
+    tryCloseFile(&_logMember.errorLog);
+    tryCloseFile(&_logMember.MotorLog);
+    tryCloseFile(&_logMember.pointLog);
+}
+
+void MainWindow::updateDirPath()
+{
+    currentPath = "results/"+getData()+"/"+getTime()+"/";
+
+
+    _mkdir("results/"+getData());
+    _mkdir(currentPath);
+    _mkdir(currentPath+string("logs/"));
+    _mkdir(currentPath+string("kanfeng/"));
+    _mkdir(currentPath+string("vertical/"));
 }
 
 bool MainWindow::GetInitPos()
@@ -113,9 +150,9 @@ bool MainWindow::GetInitPos()
     bool ret = matLine2du(temp1,temp2,_weldData.last_cali_u);
     if(!ret){
         //showMessage("ret false");
-        _logMember.errorLog<<"First Calibration False!"<<endl;
-        _logMember.errorLog<<temp1[0]<<","<<temp1[1]<<"\t"<<temp1[2]<<","<<temp1[3]<<endl;
-        _logMember.errorLog<<temp2[0]<<","<<temp2[1]<<"\t"<<temp2[2]<<","<<temp2[3]<<endl;
+        _logMember.systemLog<<"First Calibration False!"<<endl;
+        _logMember.systemLog<<temp1[0]<<","<<temp1[1]<<"\t"<<temp1[2]<<","<<temp1[3]<<endl;
+        _logMember.systemLog<<temp2[0]<<","<<temp2[1]<<"\t"<<temp2[2]<<","<<temp2[3]<<endl;
     }
 
     _weldData.last_motor_pos = _weldData.last_cali_u;
@@ -162,6 +199,8 @@ void MainWindow::weldErrServ()
     // weld stop
     allowWeld = false;
     ui->lbl_error->setText("焊接失败!");
+
+    closeLog();
 //    QMessageBox::critical(this , "critical message" , "焊接失败!",
 //                          QMessageBox::Ok | QMessageBox::Default ,
 //                          QMessageBox::Cancel | QMessageBox::Escape , 	0 );
@@ -468,7 +507,7 @@ void MainWindow::initGasFlowmeter()
             }
             catch(...)
             {
-                _logMember.errorLog<<"获取流量数据失败"<<getTime()<<endl;
+                _logMember.systemLog<<"获取流量数据失败"<<getTime()<<endl;
             }
     }
     ).detach();
@@ -601,18 +640,21 @@ void MainWindow::on_tbn_weld_clicked()
     }
     allowWeld = true;
 
+    updateDirPath();
+    openLog();
+
     workThread.reset(new std::thread([this](){
                         try
                         {
                             int errCount = 0;
-                            static long counts = 0;
-                            static int _weldErr = 0;    //平均处理时的误差计数
-                            static int averCount = 0;   //平均处理时的计数
-                            static double movePix = 0;
-                            static int maxErrorCount = 0;
+                            long counts = 0;
+                            int _weldErr = 0;    //平均处理时的误差计数
+                            int averCount = 0;   //平均处理时的计数
+                            double movePix = 0;
+                            int maxErrorCount = 0;
                             while(allowWeld)
                             {
-                                std::this_thread::sleep_for( std::chrono::milliseconds(100) ) ;
+                                std::this_thread::sleep_for( std::chrono::milliseconds(500) ) ;
                                 auto mat = _camera_ptr->takePicture().clone();
                                 cv::cvtColor(mat,mat,CV_BGR2GRAY);
                                 if(_recodeMember.allow_timer_capture)
@@ -636,7 +678,7 @@ void MainWindow::on_tbn_weld_clicked()
                                 }
                                 errCount= 0;
                                 //不设定名称会产生时间间隔的图像
-                                MainWindow::saveImg(result,"result/","twogreenlines.png");
+                                //MainWindow::saveImg(result,"result/","twogreenlines.png");
 
                                 if(matLine2du(line1,line2,_weldData.current_u)&&_runFlag.isShieldSport)
                                 {
@@ -705,7 +747,7 @@ void MainWindow::on_tbn_weld_clicked()
     );
     workThread.data()->detach();
     verticalThread.reset(new std::thread([this](){
-        static long counts = 0;
+        long counts = 0;
         while (allowWeld) {
             std::this_thread::sleep_for( std::chrono::milliseconds(30000) ) ;
             auto ver_mat = _vertical_ptr->takePicture().clone();
