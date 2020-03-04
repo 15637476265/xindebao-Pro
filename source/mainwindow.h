@@ -191,7 +191,7 @@ private:
     QScopedPointer<std::thread> workThread; //工作线程
     QScopedPointer<std::thread> verticalThread; //工作线程
     int camIndex; //相机索引
-
+    string picTarget;
 };
 
 #endif // MAINWINDOW_H

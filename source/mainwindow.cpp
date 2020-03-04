@@ -23,6 +23,7 @@ inline void tryCloseFile(ofstream *file){
 }
 
 inline void _mkdir(string path){
+    ::umask(0);     /// 创建文件夹如果没有这个，会出现权限问题  无法读写
     ::mkdir(path.c_str(),S_IRWXU);
 }
 
@@ -78,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ::mkdir("pictures/errorImg/",S_IRWXU);
 
-    string picTarget = string("pictures/")+getData().c_str()+string("/");
+    picTarget = string("pictures/")+getData().c_str()+string("/");
     ::mkdir(picTarget.c_str(),S_IRWXU);
 
     _logMember.systemLog.open("logs/Error.log",ios_base::app);
@@ -199,6 +200,7 @@ void MainWindow::weldErrServ()
     // weld stop
     allowWeld = false;
     ui->lbl_error->setText("焊接失败!");
+    ui->tbn_weld->setEnabled(true);
 
     closeLog();
 //    QMessageBox::critical(this , "critical message" , "焊接失败!",
@@ -480,8 +482,7 @@ void MainWindow::RecodeResults()
 void MainWindow::initGasFlowmeter()
 {
     std::thread([this](){
-            try
-            {
+            try{
                 while (1) {
                     std::this_thread::sleep_for(std::chrono:: milliseconds (1000));
                     QByteArray rec = Motor::GetInstance()->getGasFlowmeter();
@@ -658,7 +659,7 @@ void MainWindow::on_tbn_weld_clicked()
                                 auto mat = _camera_ptr->takePicture().clone();
                                 cv::cvtColor(mat,mat,CV_BGR2GRAY);
                                 if(_recodeMember.allow_timer_capture)
-                                    cv::imwrite("kanfeng/"+to_string(counts)+".png",mat);
+                                    cv::imwrite(currentPath+"kanfeng/"+to_string(counts)+".png",mat);
 
                                 counts++;
                                 ecdtor.getImg(mat,1);
@@ -677,8 +678,7 @@ void MainWindow::on_tbn_weld_clicked()
                                     continue;
                                 }
                                 errCount= 0;
-                                //不设定名称会产生时间间隔的图像
-                                //MainWindow::saveImg(result,"result/","twogreenlines.png");
+
 
                                 if(matLine2du(line1,line2,_weldData.current_u)&&_runFlag.isShieldSport)
                                 {
@@ -723,6 +723,7 @@ void MainWindow::on_tbn_weld_clicked()
                                         qWarning("焊缝偏移过大，请重新焊接2");
                                     }
                                     if(maxErrorCount>_welPara.MaxMotorCount){
+                                        _logMember.errorLog<<"焊缝Max Count，请重新焊接!"<<endl;
                                         emit weldErr();
                                     }
 
@@ -752,7 +753,7 @@ void MainWindow::on_tbn_weld_clicked()
             std::this_thread::sleep_for( std::chrono::milliseconds(30000) ) ;
             auto ver_mat = _vertical_ptr->takePicture().clone();
             cv::cvtColor(ver_mat,ver_mat,CV_BGR2GRAY);
-            cv::imwrite("vertical/"+to_string(counts++)+".png",ver_mat);
+            cv::imwrite(currentPath+"vertical/"+to_string(counts++)+".png",ver_mat);
 
             /* Todo */
             /* run */
